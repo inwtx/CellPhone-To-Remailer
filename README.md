@@ -20,11 +20,11 @@ user name so as to not let on that it has anything to do
 with a remailer.   This user will be the user that receives
 the encrypted emails sent from your cell phone.
 
-The program checks the 'var/mail/<username>' mail file for
-text.  If text is found, it strips out all of the pgp bundles
-and decrypts the mixmaster headers/message and sends the message
-with the mixmaster client.  The script can handle multiple
-received emails/pgp bundles if present.
+The script checks the 'var/mail/<username>' mail file for
+text.  If text is found, it strips out the pgp bundle and
+decrypts the mixmaster headers/message and sends the message
+with the mixmaster client.  The script can process multiple
+emails/pgp bundles if present.
 
 This script is executred via cron every few minutes to process
 incoming messages.
