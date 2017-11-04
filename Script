@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# MixMailFrom<username>.sh - Mail from phone to Remailer
+
+# Written for the purpose of sending remailer messages via
+# email from a cell phone.  Remailer headers and message must
+# be PGP symetrically encrypted using OpenKeyChain before it is
+# sent to mask the remailer message and headers.
+
+# Create a new user on your server.  That is all that needs
+# to be done concerning the new user.  Choose an inconspicuous
+# user name so as to not let on that it has anything to do
+# with a remailer.  This user will be the user that receives
+# the encrypted email sent from your cell phone.
+
+# The program checks the 'var/mail/<username>' mail file for
+# text.  If text is found, it strips out all of the pgp bundles
+# and decrypts the mixmaster headers/message and sends the message
+# with the mixmaster client.  The script can handle multiple
+# received emails/pgp bundles if present.
+
+# This script is executred every few minutes to process incoming
+# messages.
+# cron:
+# */1 * * * * /usr/local/sbin/MixMailFrom<username>.sh
+
+# Script parameters setup: (Replace all parameters within double quotation marks "".
+#                           These parameters are located under '# --- Parameters ---'
+#                           near line 84 below.)
+
+# username="<username>"            # the name of the new user you created on your server
+# emailaddr="<any email address>"  # an email address to receive Success/Error messages
+# passwd=""                        # the pgp symeteric password you will use to symetrically encrypt your
+#                                  # remailer headers/message on your cell phone
+
+
+#-------------------------------------------------------------#
+# Cell phone:                                                 #
+# Install 'OpenKeychain' and 'K-9 Mail'.                      #
+# [Do not use Google's AndroidEmail.  It has a return receipt #
+# feature that cannot be turned off.]                         #
+#                                                             #
+# 'Clipboard Manager'                                         #
+# I suggest you install 'Clipboard Manager' to more easily    #
+# retrieve the remailer hesders.  Place the following headers #
+# along with needed spaces in 'Clipboard Manager' and give    #
+# the clip a name.  Another clip can be made for newsgroups.  #
+#                                                             #
+# Chain *,*,*; Copies=3;                                      #
+# To:                                                         #
+# Subject:                                                    #
+# <additional blank line>                                     #
+# msg                                                         #
+#                                                             #
+# 'K-9 Mail'                                                  #
+# After installing 'K-9 Mail' and 'OpenKeychain', go to       #
+# 'K-9 Mail' Settings/Account settings/Cryptography/OpenPGP   #
+# and choose 'OpenKeychain'.                                  #
+#                                                             #
+# 'To send a message to your server for remailing':           #
+# Start 'Clipboard Manager' and retrieve the remailer headers.#
+# Start 'K-9 Mail'.  Click on the envelope icon.  Paste the   #
+# the remailer headers into the message text area and fill    #
+# them out.  Fill out the 'K-9 Mail' From, To and Subject     #
+# lines.  Now for the tricky procedure of symetrically        #
+# encrypting the remailer headers/message in the 'K-9 Mail'   #
+# Message text area.  (You could also do the encrypting       #
+# in 'OpenKeychain' and just copy it over.).  Press and hold  #
+# down on the 'K-9 Mail' Message text area and click SELECT   #
+# ALL.  In the next menu, click the 3 dots.  Then click       #
+# ENCRYPT.  Click the 3 dots again and check Encrypt with     #
+# password.  Type in the symetric password that matches the   #
+# 'passwd=' field you chose in this scrypt below.  Next       #
+# press the little clipboard icon at the top of the window    #
+# and the encrypted remailer headers/message will be placed   #
+# back into  'K-9 Mail'.  Now press the paper airplane icon   #
+# to send.                                                    #
+#-------------------------------------------------------------#
+
+
+# <<<--------remove test only--------remove test only--------remove after test
+exec >>/var/log/looog.log 2>>/var/log/looog.err.log
+set -x
+# <<<--------remove test only--------remove test only--------remove after test
+
+filePath=${0%/*} # current file path  $filePath/
+
+# --- Parameters ---
+username="mtr"  # user name used for incoming remailer mail
+emailaddr="$username@x0007.cotse.net"
+passwd="ba7/fs\7rc07xallg|rit3j0z7c7ln@wcjcb"        # pgp symeteric password
+
+if [ ! -e /var/mail/$username ] && [[ $(cat $filePath/MixMailFrom$username.ctl | wc -l) -eq 0 ]]; then  # is user's file mail present
+   echo "$(date '+%a %b %d %G %r %Z') /var/mail/$username file not present!" >> $filePath/MixMailFrom$username.err
+   mutt -s "$username malfunction!" $emailaddr <<< "/var/mail/$username mail file not present! - $(date '+%a %b %d %G %r %Z')"
+   cat "error" > $filePath/MixMailFrom$username.ctl    # mark ctl file of error
+   exit 0
+   else
+   cat /dev/null > $filePath/MixMailFrom$username.ctl  # file exist
+fi
+
+if [[ $(cat /var/mail/$username | wc -l) -eq 0 ]]; then           # is mail file empty - exit
+#   echo "$(date '+%a %b %d %G %r %Z') /var/mail/$username file empty. - $(date '+%a %b %d %G %r %Z')" >> $filePath/MixMailFrom$username.log
+   exit 0
+fi
+
+# '-------------------'
+# 'Extract PGP MESSAGE'
+# '-------------------'
+if [[ $(grep -c "\-\-\-\-\-BEGIN PGP MESSAGE\-\-\-\-\-" /var/mail/$username) -gt 0 ]]; then               # see if any messages
+   echo "$(date '+%a %b %d %G %r %Z') /var/mail/$username contains -----BEGIN PGP MESSAGE-----"
+   sed -ne '/-----BEGIN PGP MESSAGE-----/,/-----END PGP MESSAGE-----/p' < /var/mail/$username > $filePath/tempwork  # strip out pgp message
+   sed -i '/<br>/d' $filePath/tempwork                         # remove any duplicate messages with appended <br>
+   sed -e 's/=.*/=/' $filePath/tempwork > $filePath/tempwork2  # remove any added printable chars from PGP payload or decrypt will bombs
+
+   cat /dev/null > $filePath/tempwork3  # clear tempwork3
+   msgcnt=0
+
+   while read line1; do            #loop thru pgp messages, decrypt, and send with mixmaster
+         echo $line1 >> $filePath/tempwork3  # copy line 1 to tempwork3
+
+         if [[ $line1 == "-----END PGP MESSAGE-----" ]]; then                         # now have complete pgp bundle
+            echo $passwd|gpg --yes --passphrase-fd 0 --no-tty --decrypt $filePath/tempwork3 > /home/$username/message.txt 2> $filePath/MixMailFrom$username.err  # decrypt message
+
+            if [[ $(grep -c "gpg: decryption failed: bad key" $filePath/MixMailFrom$username.err) -gt 0 ]]; then  # signal bad passphrase
+               mutt -s "$username?" $emailaddr <<< "$username: bad msg - $(date '+%a %b %d %G %r %Z')"
+               cat /dev/null > $filePath/MixMailFrom$username.err
+               continue
+            fi
+
+            if [ -s /home/$username/message.txt ] && [[ $(grep -c "To: " /home/$username/message.txt) -gt 0 ]] && [[ $(grep -c "Subject: " /home/$username/message.txt) -gt 0 ]]; then  # do a bit of editing
+              ((msgcnt++))
+               sleep 5  # pause 5 sec for mixmaster
+
+               /usr/bin/mixmaster /home/$username/message.txt --send --mail  # exec mixmaster
+
+               echo "$(date '+%a %b %d %G %r %Z') Message sent." >> $filePath/MixMailFrom$username.log
+               echo "" >> $filePath/MixMailFrom$username.log
+            fi
+
+            cat /dev/null > $filePath/tempwork3
+       fi
+done< $filePath/tempwork2 # read file line by line
+
+fi  # 'if [[ $(grep'
+
+if [[ msgcnt -gt 0 ]]; then
+   mutt -s "$username!" $emailaddr <<< "$username: $msgcnt - $(date '+%a %b %d %G %r %Z')"
+fi
+
+cp /var/mail/$username /var/mail/$username.save
+shrred -n 7 -z -u /var/mail/$username  # shred/delete alread processed mail file and del any invalid msgs/spam
+cat /dev/null > /var/mail/$username  # recreate file
+
+shred -n 7 -z -u $filePath/tempwork
+shred -n 7 -z -u $filePath/tempwork2
+shred -n 7 -z -u $filePath/tempwork3
+shred -n 7 -z -u /home/$username/message.txt
+
+exit 0
