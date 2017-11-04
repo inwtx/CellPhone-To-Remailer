@@ -11,7 +11,7 @@ remailer installation.
 
 It was written for the purpose of sending remailer messages via
 email from a cell phone.  Remailer headers and message must
-be PGP symetrically encrypted using OpenKeyChain before it is
+be PGP symmetrically encrypted using OpenKeyChain before it is
 sent in order to mask the remailer message and headers.
 
 Create a new user on your server.  That is all that needs
