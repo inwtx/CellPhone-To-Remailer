@@ -30,8 +30,9 @@
 
 # username="<username>"            # the name of the new user you created on your server
 # emailaddr="<any email address>"  # an email address to receive Success/Error messages
-# passwd="<symmeteric password>"    # the pgp symmeteric password you will use to symetrically encrypt your
-#                                  # remailer headers/message on your cell phone
+# passwd="<symmeteric password>"   # the pgp symmeteric password you will use to 
+                                   # symmetrically encrypt your remailer headers/message
+                                   # on your cell phone
 
 
 #-------------------------------------------------------------#
