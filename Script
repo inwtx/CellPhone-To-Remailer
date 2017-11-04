@@ -83,7 +83,7 @@ filePath=${0%/*} # current file path  $filePath/
 
 # --- Parameters ---
 username=""  # user name used for incoming remailer mail
-emailaddr="" # an email address to receive Success/Error messages
+emailaddr="" # an email address to receive send Success/Error messages
 passwd=""    # pgp symeteric password (same one used to symmetrically encrypt on your phone)
 
 if [ ! -e /var/mail/$username ] && [[ $(cat $filePath/MixMailFrom$username.ctl | wc -l) -eq 0 ]]; then  # is user's file mail present
