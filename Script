@@ -4,7 +4,7 @@
 
 # Written for the purpose of sending remailer messages via
 # email from a cell phone.  Remailer headers and message must
-# be PGP symetrically encrypted using OpenKeyChain before it is
+# be PGP symmetrically encrypted using OpenKeyChain before it is
 # sent to mask the remailer message and headers.
 
 # Create a new user on your server.  That is all that needs
@@ -30,7 +30,7 @@
 
 # username="<username>"            # the name of the new user you created on your server
 # emailaddr="<any email address>"  # an email address to receive Success/Error messages
-# passwd="<symeteric password>"    # the pgp symeteric password you will use to symetrically encrypt your
+# passwd="<symmeteric password>"    # the pgp symmeteric password you will use to symetrically encrypt your
 #                                  # remailer headers/message on your cell phone
 
 
@@ -62,7 +62,7 @@
 # Start 'K-9 Mail'.  Click on the envelope icon.  Paste the   #
 # the remailer headers into the message text area and fill    #
 # them out.  Fill out the 'K-9 Mail' From, To and Subject     #
-# lines.  Now for the tricky procedure of symetrically        #
+# lines.  Now for the tricky procedure of symmetrically       #
 # encrypting the remailer headers/message in the 'K-9 Mail'   #
 # Message text area.  (You could also do the encrypting       #
 # in 'OpenKeychain' and just copy it over.).  Press and hold  #
@@ -82,8 +82,8 @@ filePath=${0%/*} # current file path  $filePath/
 
 # --- Parameters ---
 username=""  # user name used for incoming remailer mail
-emailaddr=""
-passwd=""        # pgp symeteric password
+emailaddr="" # an email address to receive Success/Error messages
+passwd=""    # pgp symeteric password (same one used to symmetrically encrypt on your phone)
 
 if [ ! -e /var/mail/$username ] && [[ $(cat $filePath/MixMailFrom$username.ctl | wc -l) -eq 0 ]]; then  # is user's file mail present
    echo "$(date '+%a %b %d %G %r %Z') /var/mail/$username file not present!" >> $filePath/MixMailFrom$username.err
