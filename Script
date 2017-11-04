@@ -78,11 +78,6 @@
 #-------------------------------------------------------------#
 
 
-# <<<--------remove test only--------remove test only--------remove after test
-exec >>/var/log/looog.log 2>>/var/log/looog.err.log
-set -x
-# <<<--------remove test only--------remove test only--------remove after test
-
 filePath=${0%/*} # current file path  $filePath/
 
 # --- Parameters ---
