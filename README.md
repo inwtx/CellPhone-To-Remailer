@@ -2,7 +2,7 @@
 
 Send remailer messages via email to a mixmaster server.
 
-MixMailFrom<username>.sh - Email from phone to Remailer
+MixMailFromUser.sh - Email from cell phone to Remailer
 
 This script is run on a Linux server wherein mixmaster has
 been installed.  The script will run with an installed
