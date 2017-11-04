@@ -86,9 +86,9 @@ set -x
 filePath=${0%/*} # current file path  $filePath/
 
 # --- Parameters ---
-username="mtr"  # user name used for incoming remailer mail
-emailaddr="$username@x0007.cotse.net"
-passwd="ba7/fs\7rc07xallg|rit3j0z7c7ln@wcjcb"        # pgp symeteric password
+username=""  # user name used for incoming remailer mail
+emailaddr=""
+passwd=""        # pgp symeteric password
 
 if [ ! -e /var/mail/$username ] && [[ $(cat $filePath/MixMailFrom$username.ctl | wc -l) -eq 0 ]]; then  # is user's file mail present
    echo "$(date '+%a %b %d %G %r %Z') /var/mail/$username file not present!" >> $filePath/MixMailFrom$username.err
