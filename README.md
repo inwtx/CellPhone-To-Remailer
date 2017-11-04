@@ -17,7 +17,8 @@ sent in order to mask the remailer message and headers.
 Create a new user on your server.  That is all that needs
 to be done concerning the new user.  Choose an inconspicuous
 user name so as to not let on that it has anything to do
-with a remailer.
+with a remailer.   This user will be the user that receives
+the encrypted emails sent from your cell phone.
 
 The program checks the 'var/mail/<username>' mail file for
 text.  If text is found, it strips out all of the pgp bundles
