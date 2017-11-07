@@ -11,3 +11,5 @@ remailer installation.
 
 It was written for the purpose of sending remailer messages via
 email from a cell phone.
+
+See futher setup instructions within the Script file.
